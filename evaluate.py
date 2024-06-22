@@ -57,3 +57,66 @@ class Layout:
             'shift': False
         }
         return keys
+
+
+class Runner:
+    def __init__(self, text: str, effort_limit: int = 3000000):
+        self.text = text.strip()
+        self.effort_limit = effort_limit
+        self.same_finger_penalty = 10
+        self.same_hand_penalty = 1
+
+    def type_with(self, layout: Layout) -> Dict:
+        position = 0
+        distance = 0
+        effort = 0
+        prev_key = layout.metrics[' ']
+        
+        while effort < self.effort_limit:
+            symbol = self.text[position % len(self.text)]
+            key = layout.metrics.get(symbol)
+            
+            if key is None:
+                prev_key = layout.metrics[' ']
+                position += 1
+                continue
+            
+            distance += key['distance']
+            effort += key['effort']
+            
+            if key['hand'] != 'both' and key != prev_key:
+                if key['finger'] == prev_key['finger']:
+                    effort += (prev_key['effort'] + 1) * self.same_finger_penalty
+                elif key['hand'] == prev_key['hand']:
+                    effort += (prev_key['effort'] + 1) * self.same_hand_penalty
+            
+            prev_key = key
+            position += 1
+
+        return {
+            'position': position,
+            'distance': distance,
+            'effort': round(effort)
+        }
+
+def print_results(layout_name: str, result: Dict):
+    print(f"Layout: {layout_name}")
+    print(f"Position reached: {result['position']}")
+    print(f"Total distance: {result['distance']}")
+    print(f"Total effort: {result['effort']}")
+    print(f"Distance per symbol: {result['distance'] / result['position']:.3f}")
+    print(f"Effort per symbol: {result['effort'] / result['position']:.3f}")
+
+if __name__ == "__main__":
+    qwerty_layout = Layout("QWERTY", """
+    ` 1 2 3 4 5 6 7 8 9 0 - =
+      q w e r t y u i o p [ ] \\
+      a s d f g h j k l ; ' \\n
+      z x c v b n m , . /
+    """)
+
+    sample_text = "It was interesting to see how the grey fox tackled his brother"
+    runner = Runner(sample_text)
+    result = runner.type_with(qwerty_layout)
+
+    print_results(qwerty_layout.name, result)
