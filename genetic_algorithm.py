@@ -5,7 +5,7 @@ from evaluate import Layout, Runner
 
 population_size = 100
 selection_num = 10
-cycles = 10
+cycles = 100
 
 data_path = 'abstracts.json'
 data_size = 10
@@ -83,11 +83,21 @@ def population_selection(population):
             totalFitness += calculate_fitness(result)
         average_fitness = totalFitness/data_size
         populationEvalScore.append(average_fitness)
-        print(average_fitness)
+    
+    total_eval_score = sum(populationEvalScore)
+    print("\033[92m" + str(total_eval_score/population_size) + "\033[0m")
     
     layouts_with_scores = list(zip(population, populationEvalScore))
     layouts_with_scores.sort(key=lambda x: x[1], reverse=True)
     selected_layouts = [layout for layout, _ in layouts_with_scores[:selection_num]]
+    best_layout_list = selected_layouts[0].get_layout_list()
+    best_layout_spring = f"""
+    {' '.join(best_layout_list[0:13])}
+      {' '.join(best_layout_list[13:26])}
+      {' '.join(best_layout_list[26:38])}
+      {' '.join(best_layout_list[38:47])}
+    """
+    print("\033[92m" + best_layout_spring + "\033[0m")
 
     return selected_layouts
 
@@ -130,6 +140,8 @@ def population_crossover(population,currentCycle):
         offspring_count += 1
         new_population.append(Layout(f"Layout_{offspring_count + (population_size * (currentCycle + 1))}" ,layout_offspring2_string))
         offspring_count += 1
+    
+    return new_population
 
 if __name__ == "__main__":
     population = generate_starting_population(population_size)
