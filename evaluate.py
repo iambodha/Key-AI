@@ -57,7 +57,13 @@ class Layout:
             'shift': False
         }
         return keys
-
+    
+    def get_layout_list(self) -> List[str]:
+        lines = self.config.strip().split('\n')
+        config_list = []
+        for line in lines:
+            config_list.extend(line.split())
+        return config_list
 
 class Runner:
     def __init__(self, text: str, effort_limit: int = 3000000):
@@ -114,6 +120,8 @@ if __name__ == "__main__":
       a s d f g h j k l ; ' \\n
       z x c v b n m , . /
     """)
+
+    print(qwerty_layout.get_layout_list())
 
     sample_text = "It was interesting to see how the grey fox tackled his brother"
     runner = Runner(sample_text)
