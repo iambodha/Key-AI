@@ -29,3 +29,46 @@ def generate_random_layout(name):
     
     return Layout(name, layout_string)
 
+def generate_starting_population(population_size):
+    population = []
+    for i in range(population_size):
+        layout = generate_random_layout(f"Layout_{i}")
+        population.append(layout)
+    return population
+
+def reservoir_sampling(file_path, data_size):
+    sample = []
+    with open(file_path, 'r') as infile:
+        data = json.load(infile)
+        for i, entry in enumerate(data):
+            if i < data_size:
+                sample.append(entry['abstract'])
+            else:
+                j = random.randint(0, i)
+                if j < data_size:
+                    sample[j] = entry['abstract']
+    return sample
+
+
+
+def population_selection(population):
+    populationEvalScore = []
+    runners = []
+    texts = reservoir_sampling(data_path,data_size)
+
+    for text in texts:
+        runner = Runner(text)
+        runners.append(runner)
+
+    for layout in population:
+        results = []
+        totalFitness = 0
+        for runner in runners:
+            result = runner.type_with(layout)
+            results.append(result)
+        for result in results:
+
+
+if __name__ == "__main__":
+    population = generate_starting_population(population_size)
+    population_selection(population)
