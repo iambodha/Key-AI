@@ -10,7 +10,7 @@ population_size = 100
 selection_num = 10
 cycles = 100
 
-data_path = 'abstracts.json'
+data_path = 'Data/'
 data_size = 10
 
 def generate_random_layout(name):
@@ -39,7 +39,11 @@ def generate_starting_population(population_size):
         population.append(layout)
     return population
 
-def reservoir_sampling(file_path, data_size):
+def reservoir_sampling(data_directory, data_size):
+    files = [f for f in os.listdir(data_directory) if f.endswith('.json')]
+    random_file = random.choice(files)
+    file_path = os.path.join(data_directory, random_file)
+    
     sample = []
     with open(file_path, 'r') as infile:
         data = json.load(infile)
@@ -50,6 +54,7 @@ def reservoir_sampling(file_path, data_size):
                 j = random.randint(0, i)
                 if j < data_size:
                     sample[j] = entry['abstract']
+    
     return sample
 
 def calculate_fitness(result):
@@ -88,6 +93,8 @@ def population_selection(population):
     
     # Extract fitness scores from results
     populationEvalScore = [fitness for layout, fitness in results]
+    total_eval_score = sum(populationEvalScore)
+    print("\033[92m" + str(total_eval_score/population_size) + "\033[0m")
     
     # Sort layouts by fitness
     layouts_with_scores = list(zip(population, populationEvalScore))
@@ -106,7 +113,17 @@ def population_selection(population):
 
     return selected_layouts
 
-def crossover_layouts(layout1, layout2, crossover_point1, crossover_point2):
+def order_crossover(p1, p2, cp1, cp2):
+    offspring = [None] * len(p1)
+    offspring[cp1:cp2+1] = p1[cp1:cp2+1]
+    current_pos = (cp2 + 1) % len(p1)
+    for item in p2:
+        if item not in offspring:
+            offspring[current_pos] = item
+            current_pos = (current_pos + 1) % len(p1)
+    return offspring
+
+def crossover_layouts(layout1, layout2, crossover_point1, crossover_point2, currentCycle):
     layout1_string = layout1.get_layout_list()
     layout2_string = layout2.get_layout_list()
 
@@ -125,8 +142,8 @@ def crossover_layouts(layout1, layout2, crossover_point1, crossover_point2):
       {' '.join(layout_offspring2[26:38])}
       {' '.join(layout_offspring2[38:47])}
     """
-    
-    return Layout(layout_offspring1_string), Layout(layout_offspring2_string)
+
+    return Layout(f"Layout_{currentCycle + population_size}",layout_offspring1_string), Layout(f"Layout_{currentCycle + population_size}",layout_offspring2_string)
 
 def population_crossover(population, currentCycle):
     new_population = []
@@ -137,7 +154,7 @@ def population_crossover(population, currentCycle):
         for layout1, layout2 in itertools.combinations(population, 2):
             crossover_point1 = random.randint(0, len(layout1.get_layout_list()) - 2)
             crossover_point2 = random.randint(crossover_point1 + 1, len(layout1.get_layout_list()) - 1)
-            results.append(pool.apply_async(crossover_layouts, (layout1, layout2, crossover_point1, crossover_point2)))
+            results.append(pool.apply_async(crossover_layouts, (layout1, layout2, crossover_point1, crossover_point2, currentCycle)))
         
         for result in results:
             layout_offspring1, layout_offspring2 = result.get()
