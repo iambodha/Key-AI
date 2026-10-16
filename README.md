@@ -1,3 +1,16 @@
+# Key-AI
+
+> **Superseded by [ChordScribe](https://github.com/iambodha/ChordScribe).** Use the successor for current development, setup instructions, and new issues.
+
+Historical genetic-algorithm experiments for keyboard layout optimization. This repository is retained as a historical predecessor; it is no longer developed independently. Its files and commit history remain available for reference.
+
+[Continue to ChordScribe →](https://github.com/iambodha/ChordScribe)
+
+---
+
+<details>
+<summary>Original project README (historical)</summary>
+
 # Key AI ⌨️🤖
 
 Key AI is an advanced keyboard layout optimization system designed to boost typing speed, improve efficiency, and reduce finger strain. By leveraging AI, Key AI generates custom keyboard layouts tailored for various scenarios, such as programming, multilingual typing, and more. Traditional layouts like QWERTY are far from optimal—Key AI can make typing up to 2x more efficient using cutting-edge algorithms.
@@ -39,3 +52,5 @@ This project is licensed under the [MIT License](LICENSE).
 ---
 
 Unlock your typing potential with Key AI—making every keystroke count! 🚀✨
+
+</details>
